@@ -4,17 +4,24 @@ part of 'repo_bloc.dart';
 abstract class RepoEvent {}
 
 class GetUsers extends RepoEvent {
-  final String UserName;
+  final String userName;
   final int pagenumber;
 
-  GetUsers(this.UserName, this.pagenumber);
+  GetUsers(this.userName, this.pagenumber);
+}
+
+class GetProfileInfo extends RepoEvent {
+  final String query;
+  final int index;
+
+  GetProfileInfo(this.query, this.index);
 }
 
 class GetMoreUsers extends RepoEvent {
-  final String UserName;
+  final String userName;
   final int pagenumber;
 
-  GetMoreUsers(this.UserName, this.pagenumber);
+  GetMoreUsers(this.userName, this.pagenumber);
 }
 
 class GetIssues extends RepoEvent {
@@ -62,4 +69,14 @@ class DeleteList extends RepoEvent {
 class ChangeCategoriesEvent extends RepoEvent {
   final String categories;
   ChangeCategoriesEvent(this.categories);
+}
+
+class ChangetoLazyLoading extends RepoEvent {
+  final String categories;
+  ChangetoLazyLoading(this.categories);
+}
+
+class ChangeToIndex extends RepoEvent {
+  final String categories;
+  ChangeToIndex(this.categories);
 }

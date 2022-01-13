@@ -11,17 +11,17 @@ class RepoIssues {
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
-        items!.add(new Items.fromJson(v));
+        items!.add(Items.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['total_count'] = this.totalCount;
-    data['incomplete_results'] = this.incompleteResults;
-    if (this.items != null) {
-      data['items'] = this.items!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['total_count'] = totalCount;
+    data['incomplete_results'] = incompleteResults;
+    if (items != null) {
+      data['items'] = items!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -95,27 +95,27 @@ class Items {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['url'] = this.url;
-    data['repository_url'] = this.repositoryUrl;
-    data['labels_url'] = this.labelsUrl;
-    data['comments_url'] = this.commentsUrl;
-    data['events_url'] = this.eventsUrl;
-    data['html_url'] = this.htmlUrl;
-    data['id'] = this.id;
-    data['node_id'] = this.nodeId;
-    data['number'] = this.number;
-    data['title'] = this.title;
-    data['state'] = this.state;
-    data['locked'] = this.locked;
-    data['comments'] = this.comments;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['closed_at'] = this.closedAt;
-    data['author_association'] = this.authorAssociation;
-    data['body'] = this.body;
-    data['timeline_url'] = this.timelineUrl;
-    data['score'] = this.score;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['url'] = url;
+    data['repository_url'] = repositoryUrl;
+    data['labels_url'] = labelsUrl;
+    data['comments_url'] = commentsUrl;
+    data['events_url'] = eventsUrl;
+    data['html_url'] = htmlUrl;
+    data['id'] = id;
+    data['node_id'] = nodeId;
+    data['number'] = number;
+    data['title'] = title;
+    data['state'] = state;
+    data['locked'] = locked;
+    data['comments'] = comments;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['closed_at'] = closedAt;
+    data['author_association'] = authorAssociation;
+    data['body'] = body;
+    data['timeline_url'] = timelineUrl;
+    data['score'] = score;
     return data;
   }
 }

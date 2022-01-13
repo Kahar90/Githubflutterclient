@@ -1,36 +1,6 @@
-class RepoUser {
-  // ignore: unnecessary_question_mark
-  dynamic? totalCount;
-  bool? incompleteResults;
-  List<Items>? items;
-
-  RepoUser({this.totalCount, this.incompleteResults, this.items});
-
-  RepoUser.fromJson(Map<String, dynamic> json) {
-    totalCount = json['total_count'];
-    incompleteResults = json['incomplete_results'];
-    if (json['items'] != null) {
-      items = <Items>[];
-      json['items'].forEach((v) {
-        items!.add(Items.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['total_count'] = totalCount;
-    data['incomplete_results'] = incompleteResults;
-    if (items != null) {
-      data['items'] = items!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class Items {
+class RepoProfileInfo {
   String? login;
-  dynamic id;
+  int? id;
   String? nodeId;
   String? avatarUrl;
   String? gravatarId;
@@ -47,9 +17,22 @@ class Items {
   String? receivedEventsUrl;
   String? type;
   bool? siteAdmin;
-  dynamic score;
+  String? name;
+  String? company;
+  String? blog;
+  String? location;
+  String? email;
+  bool? hireable;
+  String? bio;
+  String? twitterUsername;
+  int? publicRepos;
+  int? publicGists;
+  int? followers;
+  int? following;
+  String? createdAt;
+  String? updatedAt;
 
-  Items(
+  RepoProfileInfo(
       {this.login,
       this.id,
       this.nodeId,
@@ -68,9 +51,22 @@ class Items {
       this.receivedEventsUrl,
       this.type,
       this.siteAdmin,
-      this.score});
+      this.name,
+      this.company,
+      this.blog,
+      this.location,
+      this.email,
+      this.hireable,
+      this.bio,
+      this.twitterUsername,
+      this.publicRepos,
+      this.publicGists,
+      this.followers,
+      this.following,
+      this.createdAt,
+      this.updatedAt});
 
-  Items.fromJson(Map<String, dynamic> json) {
+  RepoProfileInfo.fromJson(Map<String, dynamic> json) {
     login = json['login'];
     id = json['id'];
     nodeId = json['node_id'];
@@ -89,7 +85,20 @@ class Items {
     receivedEventsUrl = json['received_events_url'];
     type = json['type'];
     siteAdmin = json['site_admin'];
-    score = json['score'];
+    name = json['name'];
+    company = json['company'];
+    blog = json['blog'];
+    location = json['location'];
+    email = json['email'];
+    hireable = json['hireable'];
+    bio = json['bio'];
+    twitterUsername = json['twitter_username'];
+    publicRepos = json['public_repos'];
+    publicGists = json['public_gists'];
+    followers = json['followers'];
+    following = json['following'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
@@ -112,7 +121,20 @@ class Items {
     data['received_events_url'] = receivedEventsUrl;
     data['type'] = type;
     data['site_admin'] = siteAdmin;
-    data['score'] = score;
+    data['name'] = name;
+    data['company'] = company;
+    data['blog'] = blog;
+    data['location'] = location;
+    data['email'] = email;
+    data['hireable'] = hireable;
+    data['bio'] = bio;
+    data['twitter_username'] = twitterUsername;
+    data['public_repos'] = publicRepos;
+    data['public_gists'] = publicGists;
+    data['followers'] = followers;
+    data['following'] = following;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }

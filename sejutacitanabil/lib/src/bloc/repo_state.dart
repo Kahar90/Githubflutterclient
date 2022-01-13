@@ -13,15 +13,33 @@ class RepoLoading extends RepoState {
   const RepoLoading();
 }
 
+class RepoLoadingUsers extends RepoState {
+  const RepoLoadingUsers();
+}
+
+class RepoLoadingIssues extends RepoState {
+  const RepoLoadingIssues();
+}
+
+class RepoLoadingRepos extends RepoState {
+  const RepoLoadingRepos();
+}
+
 class RepoUserLoaded extends RepoState {
-  final repoUser Userdata;
-  const RepoUserLoaded(this.Userdata);
+  final RepoUser userdata;
+  const RepoUserLoaded(this.userdata);
+}
+
+class RepoProfileLoaded extends RepoState {
+  final int index;
+  final RepoProfileInfo repoProfileInfo;
+  const RepoProfileLoaded(this.index, this.repoProfileInfo);
 }
 
 class MoreRepoUserLoaded extends RepoState {
-  final repoUser Userdata;
+  final RepoUser userdata;
   final String query;
-  const MoreRepoUserLoaded(this.Userdata, this.query);
+  const MoreRepoUserLoaded(this.userdata, this.query);
 }
 
 class RepoIssuesLoaded extends RepoState {
@@ -36,45 +54,95 @@ class MoreRepoIssuesLoaded extends RepoState {
 }
 
 class RepoReposLoaded extends RepoState {
-  final repoRepos reposData;
+  final RepoRepos reposData;
   const RepoReposLoaded(this.reposData);
 }
 
 class MoreRepoReposLoaded extends RepoState {
-  final repoRepos reposData;
+  final RepoRepos reposData;
   final String query;
   const MoreRepoReposLoaded(this.reposData, this.query);
 }
 
 class EmptyDataIssues extends RepoState {
-  EmptyDataIssues();
+  const EmptyDataIssues();
 }
 
 class EmptyDataUsers extends RepoState {
-  EmptyDataUsers();
+  const EmptyDataUsers();
 }
 
 class EmptyDataRepos extends RepoState {
-  EmptyDataRepos();
+  const EmptyDataRepos();
 }
 
 class ClearList extends RepoState {
-  ClearList();
+  const ClearList();
 }
 
 class HTTPError extends RepoState {
-  HTTPError();
+  const HTTPError();
+}
+
+class HTTPErrorUsers extends RepoState {
+  const HTTPErrorUsers();
+}
+
+class HTTPErrorIssues extends RepoState {
+  const HTTPErrorIssues();
+}
+
+class HTTPErrorRepos extends RepoState {
+  const HTTPErrorRepos();
 }
 
 class Error extends RepoState {
-  Error();
+  const Error();
 }
 
 class ChangeCategories extends RepoState {
-  ChangeCategories();
+  const ChangeCategories();
 }
 
 class InitiateChange extends RepoState {
   final String whattodo;
-  InitiateChange(this.whattodo);
+  const InitiateChange(this.whattodo);
+}
+
+class InitiateChangeViewUsersLoading extends RepoState {
+  final String whattodo;
+  const InitiateChangeViewUsersLoading(this.whattodo);
+}
+
+class InitiateChangeViewIssuesLoading extends RepoState {
+  final String whattodo;
+  const InitiateChangeViewIssuesLoading(this.whattodo);
+}
+
+class InitiateChangeViewReposLoading extends RepoState {
+  final String whattodo;
+  const InitiateChangeViewReposLoading(this.whattodo);
+}
+
+class InitiateChangeViewUsersIndex extends RepoState {
+  final String whattodo;
+  const InitiateChangeViewUsersIndex(this.whattodo);
+}
+
+class InitiateChangeViewIssuesIndex extends RepoState {
+  final String whattodo;
+  const InitiateChangeViewIssuesIndex(this.whattodo);
+}
+
+class InitiateChangeViewReposIndex extends RepoState {
+  final String whattodo;
+  const InitiateChangeViewReposIndex(this.whattodo);
+}
+
+class LazyLoadingState extends RepoState {
+  const LazyLoadingState();
+}
+
+class IndexState extends RepoState {
+  const IndexState();
 }

@@ -6,6 +6,7 @@ class Globals {
   }
   Globals._internal();
   String? queryUsers;
+  String? Pilihan;
 }
 
 // class Singleton {

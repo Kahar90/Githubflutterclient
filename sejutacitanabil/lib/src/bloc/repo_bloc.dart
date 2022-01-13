@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 import 'package:sejutacitanabil/src/functions.dart';
-import 'package:sejutacitanabil/src/models/repoIssues.dart';
+import 'package:sejutacitanabil/src/models/repo_issues.dart';
+import 'package:sejutacitanabil/src/models/repoProfileInfo.dart';
 import 'package:sejutacitanabil/src/models/repoRepos.dart';
 import 'package:sejutacitanabil/src/models/repoUser.dart';
 
@@ -13,29 +11,47 @@ part 'repo_state.dart';
 
 class RepoBloc extends Bloc<RepoEvent, RepoState> {
   final Functions _functions;
-  RepoBloc(this._functions) : super(RepoInitial()) {
+  RepoBloc(this._functions) : super(const RepoInitial()) {
+    //USERS
     on<GetUsers>(
       (event, emit) async {
-        emit(RepoLoading());
-        final Userdata =
-            await _functions.getUser(event.UserName, event.pagenumber);
-        emit(RepoUserLoaded(Userdata));
+        try {
+          emit(const RepoLoadingUsers());
+          final userdata =
+              await _functions.getUser(event.userName, event.pagenumber);
+          emit(RepoUserLoaded(userdata));
+        } catch (e) {
+          emit(const HTTPErrorUsers());
+        }
       },
     );
     on<GetMoreUsers>((event, emit) async {
       try {
-        final Userdata =
-            await _functions.getUser(event.UserName, event.pagenumber);
-        emit(MoreRepoUserLoaded(Userdata, event.UserName));
+        final userdata =
+            await _functions.getUser(event.userName, event.pagenumber);
+        emit(MoreRepoUserLoaded(userdata, event.userName));
       } catch (e) {
-        emit(HTTPError());
+        emit(const HTTPErrorUsers());
       }
-      //String query = event.UserName;
     });
+    on<GetProfileInfo>((event, emit) async {
+      try {
+        final profileInfoData = await _functions.getProfileInfo(event.query);
+        emit(RepoProfileLoaded(event.index, profileInfoData));
+      } catch (e) {
+        emit(const HTTPErrorUsers());
+      }
+    });
+    //ISSUES
     on<GetIssues>((event, emit) async {
-      final issuesData =
-          await _functions.getIssues(event.query, event.pagenumber);
-      emit(RepoIssuesLoaded(issuesData));
+      emit(const RepoLoadingIssues());
+      try {
+        final issuesData =
+            await _functions.getIssues(event.query, event.pagenumber);
+        emit(RepoIssuesLoaded(issuesData));
+      } catch (e) {
+        emit(const HTTPErrorIssues());
+      }
     });
     on<GetMoreIssues>((event, emit) async {
       try {
@@ -43,19 +59,18 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
             await _functions.getIssues(event.query, event.pagenumber);
         emit(MoreRepoIssuesLoaded(issuesData, event.query));
       } catch (e) {
-        emit(HTTPError());
+        emit(const HTTPErrorIssues());
       }
-      //String query = event.UserName;
     });
+    //REPOS
     on<GetRepositories>((event, emit) async {
+      emit(const RepoLoadingRepos());
       try {
         final reposData =
             await _functions.getRepos(event.query, event.pagenumber);
         emit(RepoReposLoaded(reposData));
       } catch (e) {
-        print("dugaan?");
-        print(e);
-        emit(HTTPError());
+        emit(const HTTPErrorRepos());
       }
     });
     on<GetMoreRepositories>((event, emit) async {
@@ -64,24 +79,55 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
             await _functions.getRepos(event.query, event.pagenumber);
         emit(MoreRepoReposLoaded(reposData, event.query));
       } catch (e) {
-        emit(HTTPError());
+        emit(const HTTPErrorRepos());
       }
     });
+    //MISC
     on<ChangeCategoriesEvent>((event, emit) {
-      emit(ClearList());
+      emit(const ClearList());
       emit(InitiateChange(event.categories));
     });
+    on<ChangetoLazyLoading>((event, emit) {
+      //emit(const LazyLoadingState());
+      if (event.categories == "USERS") {
+        emit(InitiateChangeViewUsersLoading(event.categories));
+        print("InitiateChangeViewUsersLoading");
+      }
+      if (event.categories == "ISSUES") {
+        emit(InitiateChangeViewIssuesLoading(event.categories));
+        print("InitiateChangeViewIssuesLoading");
+      }
+      if (event.categories == "REPOSITORIES") {
+        emit(InitiateChangeViewReposLoading(event.categories));
+        print("InitiateChangeViewReposLoading");
+      }
+    });
+    on<ChangeToIndex>((event, emit) {
+      // emit(const IndexState());
+      if (event.categories == "USERS") {
+        emit(InitiateChangeViewUsersIndex(event.categories));
+        print("InitiateChangeViewUsersIndex");
+      }
+      if (event.categories == "ISSUES") {
+        emit(InitiateChangeViewIssuesIndex(event.categories));
+        print("InitiateChangeViewIssuesIndex");
+      }
+      if (event.categories == "REPOSITORIES") {
+        emit(InitiateChangeViewReposIndex(event.categories));
+        print("InitiateChangeViewReposIndex");
+      }
+    });
     on<DeleteList>((event, emit) {
-      emit(ClearList());
+      emit(const ClearList());
     });
     on<EmptyDataEventUsers>((event, emit) {
-      emit(EmptyDataUsers());
+      emit(const EmptyDataUsers());
     });
     on<EmptyDataEventIssues>((event, emit) {
-      emit(EmptyDataIssues());
+      emit(const EmptyDataIssues());
     });
     on<EmptyDataEventRepos>((event, emit) {
-      emit(EmptyDataRepos());
+      emit(const EmptyDataRepos());
     });
   }
 }
