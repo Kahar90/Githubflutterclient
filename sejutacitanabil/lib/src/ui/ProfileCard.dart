@@ -3,16 +3,21 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-Widget alertDialog(BuildContext context, List<dynamic>? data, dynamic state) {
+Widget alertDialog(BuildContext context, dynamic data, dynamic state,
+    bool indexstate, int page) {
   return AlertDialog(
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(20))),
     title: Container(
       height: 150,
       width: 150,
-      child: FadeInImage.memoryNetwork(
-          placeholder: kTransparentImage,
-          image: "${data?[state.index].avatarUrl}"),
+      child: !indexstate
+          ? FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage,
+              image: "${data?[state.index].avatarUrl}")
+          : FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage,
+              image: "${data?[page][state.index].avatarUrl}"),
     ),
     content: Container(
       height: MediaQuery.of(context).size.height * 0.26,

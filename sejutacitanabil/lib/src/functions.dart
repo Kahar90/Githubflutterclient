@@ -15,6 +15,8 @@ class Functions {
     var response = await Dio().get(Uri.parse(link).toString());
     var userData = RepoUser.fromJson(jsonDecode(response.toString()));
 
+    print("function get user called with query $query and pagenum $pagenum");
+
     return userData;
   }
 
@@ -25,6 +27,8 @@ class Functions {
     var response = await Dio().get(Uri.parse(link).toString());
 
     var issuesData = RepoIssues.fromJson(jsonDecode(response.toString()));
+
+    print("function get issues called with query $query and pagenum $pagenum");
 
     return issuesData;
   }
@@ -37,6 +41,9 @@ class Functions {
 
     var reposData = RepoRepos.fromJson(jsonDecode(response.toString()));
 
+    print("function get repos called with query $query and pagenum $pagenum");
+    print("dari function getrepos : ${reposData.items?.length}");
+
     return reposData;
   }
 
@@ -44,6 +51,8 @@ class Functions {
     var response = await Dio().get(Uri.parse(query).toString());
 
     var profileData = RepoProfileInfo.fromJson(jsonDecode(response.toString()));
+
+    print("function get profile called with query $query");
 
     return profileData;
   }
