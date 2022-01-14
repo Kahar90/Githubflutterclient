@@ -2,9 +2,9 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sejutacitanabil/src/bloc/repo_bloc.dart';
-import 'package:sejutacitanabil/src/globals.dart';
 import 'package:sejutacitanabil/src/ui/PersistentHeaders.dart';
 import 'package:sejutacitanabil/src/ui/ProfileCard.dart';
 import 'package:sejutacitanabil/src/ui/Widgets.dart';
@@ -34,16 +34,17 @@ class _RepoLogicState extends State<RepoLogic> {
   bool isloading = false;
   int pagenum = 1;
   int pageCountControl = 0;
-  var globals = Globals();
+
   String? pilihan = "USERS";
   String? tempcheck;
   bool lazyloading = true;
   bool indexstate = false;
   RegExp reg = RegExp("^([^T])+");
+  var scrollposition;
 
   //USERS
-  List<dynamic>? data = [];
-  List<List<dynamic>?>? dataforIndex = [[]];
+  List<dynamic> data = [];
+  List<List<dynamic>>? dataforIndex = [[]];
 
   //ISSUES
   List<dynamic>? issuesTitle = [];
@@ -59,6 +60,12 @@ class _RepoLogicState extends State<RepoLogic> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     _scrollController.addListener(() {
       if (lazyloading) {
         if (_scrollController.position.maxScrollExtent ==
@@ -66,264 +73,265 @@ class _RepoLogicState extends State<RepoLogic> {
             !isloading) {
           getMoreDataAccordingToCategories();
         }
+        if (_scrollController.offset < 2400) {
+          pageCountControl = 0;
+        } else {
+          pageCountControl = (_scrollController.offset / 2400).floor();
+        }
       }
     });
 
-    return SafeArea(
-      child: BlocConsumer<RepoBloc, RepoState>(
-        listener: (context, state) {
-          if (state is EmptyDataUsers ||
-              state is EmptyDataIssues ||
-              state is EmptyDataRepos) {
-            emptyData();
-          }
-          if (state is HTTPErrorUsers ||
-              state is HTTPErrorIssues ||
-              state is HTTPErrorRepos) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                backgroundColor: Colors.black54,
-                content: Text(
-                    "HTTP Error, you have either hit the max API calls, or query inputted is invalid")));
-            isloading = false;
-          }
-          if (state is RepoLoadingUsers ||
-              state is RepoLoadingIssues ||
-              state is RepoLoadingRepos) {
-            repoLoading();
-          }
-          if (state is RepoProfileLoaded) {
-            repoProfileLoaded(state);
-          }
-          //USERS STATE CONTROL
-          if (state is RepoUserLoaded) {
-            List<dynamic>? temp = [];
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            repoUserLoaded(state, temp);
-          }
-          if (state is MoreRepoUserLoaded) {
-            List<dynamic>? temp = [];
-            temp.clear();
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            moreRepoUserLoaded(state, temp);
-          }
+    return BlocConsumer<RepoBloc, RepoState>(
+      listener: (context, state) {
+        if (state is EmptyDataUsers ||
+            state is EmptyDataIssues ||
+            state is EmptyDataRepos) {
+          emptyData();
+        }
+        if (state is HTTPErrorUsers ||
+            state is HTTPErrorIssues ||
+            state is HTTPErrorRepos) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              backgroundColor: Colors.black54,
+              content: Text(
+                  "HTTP Error, you have either hit the max API calls, or query inputted is invalid")));
+          isloading = false;
+        }
+        if (state is RepoLoadingUsers ||
+            state is RepoLoadingIssues ||
+            state is RepoLoadingRepos) {
+          repoLoading();
+        }
+        if (state is RepoProfileLoaded) {
+          repoProfileLoaded(state);
+        }
+        //USERS STATE CONTROL
+        if (state is RepoUserLoaded) {
+          List<dynamic> temp = [];
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          repoUserLoaded(state, temp);
+        }
+        if (state is MoreRepoUserLoaded) {
+          List<dynamic> temp = [];
 
-          //ISSUES STATE CONTROL
-          if (state is RepoIssuesLoaded) {
-            List<dynamic>? temp = [];
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            repoIssuesLoaded(state, temp);
-          }
-          if (state is MoreRepoIssuesLoaded) {
-            List<dynamic>? temp = [];
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            moreRepoIssuesLoaded(state, temp);
-          }
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          moreRepoUserLoaded(state, temp);
+        }
 
-          //REPOS STATE CONTROL
-          if (state is RepoReposLoaded) {
-            List<dynamic>? temp = [];
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            repoReposLoaded(state, temp);
-          }
+        //ISSUES STATE CONTROL
+        if (state is RepoIssuesLoaded) {
+          List<dynamic> temp = [];
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          repoIssuesLoaded(state, temp);
+        }
+        if (state is MoreRepoIssuesLoaded) {
+          List<dynamic> temp = [];
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          moreRepoIssuesLoaded(state, temp);
+        }
 
-          if (state is MoreRepoReposLoaded) {
-            List<dynamic>? temp = [];
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            moreRepoReposLoaded(state, temp);
-          }
+        //REPOS STATE CONTROL
+        if (state is RepoReposLoaded) {
+          List<dynamic> temp = [];
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          repoReposLoaded(state, temp);
+        }
 
-          if (state is InitiateChangeViewUsersLoading ||
-              state is InitiateChangeViewIssuesLoading ||
-              state is InitiateChangeViewReposLoading) {
-            lazyloading = true;
-            indexstate = false;
-          }
+        if (state is MoreRepoReposLoaded) {
+          List<dynamic> temp = [];
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          moreRepoReposLoaded(state, temp);
+        }
 
-          if (state is InitiateChangeViewUsersIndex ||
-              state is InitiateChangeViewIssuesIndex ||
-              state is InitiateChangeViewReposIndex) {
-            _scrollController.jumpTo(pagenum != 1 ? pagenum * 30 : 1);
-            lazyloading = false;
-            indexstate = true;
-          }
+        if (state is InitiateChangeViewUsersLoading ||
+            state is InitiateChangeViewIssuesLoading ||
+            state is InitiateChangeViewReposLoading) {
+          _scrollController.jumpTo(scrollposition);
+        }
 
-          if (state is InitiateChange) {
-            pilihan = state.whattodo;
-            initiateChange(state);
-          }
-          if (state is ClearList) {
-            clearList();
-          }
-          if (state is Error) {}
-        },
-        builder: (context, state) {
-          return GestureDetector(
-            onTap: () {
-              FocusNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus) {
-                currentFocus.unfocus();
-              }
-            },
-            child: Scaffold(
-              backgroundColor: Colors.grey[200],
-              body: CustomScrollView(
-                controller: _scrollController,
-                slivers: <Widget>[
-                  SliverPersistentHeader(
-                      floating: true,
-                      delegate: SliverAppBarDelegate(
-                          child: PreferredSize(
-                        preferredSize: const Size.fromHeight(40),
+        if (state is InitiateChangeViewUsersIndex ||
+            state is InitiateChangeViewIssuesIndex ||
+            state is InitiateChangeViewReposIndex) {
+          scrollposition = _scrollController.offset;
+          _scrollController.jumpTo(1);
+        }
+
+        if (state is InitiateChange) {
+          pilihan = state.whattodo;
+          initiateChange(state);
+        }
+        if (state is ClearList) {
+          clearList();
+        }
+        if (state is Error) {}
+      },
+      builder: (context, state) {
+        return GestureDetector(
+          onTap: () {
+            FocusNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+          },
+          child: Scaffold(
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(1),
+              child: AppBar(
+                backgroundColor: Colors.white,
+                elevation: 0,
+              ),
+            ),
+            backgroundColor: Colors.grey[200],
+            body: CustomScrollView(
+              controller: _scrollController,
+              slivers: <Widget>[
+                SliverPersistentHeader(
+                    floating: true,
+                    delegate: SliverAppBarDelegate(
+                        child: PreferredSize(
+                      preferredSize: const Size.fromHeight(40),
+                      child: Center(
                         child: FirstHeader(
                             context,
                             textEditingController,
                             searchQuery,
                             getDataAccordingToCategories,
                             clearTextController),
-                      ))),
-                  SliverPersistentHeader(
-                      pinned: true,
-                      delegate: SliverAppBarDelegate(
-                          child: PreferredSize(
-                        preferredSize: const Size.fromHeight(80),
-                        child: secondHeader(
+                      ),
+                    ))),
+                SliverPersistentHeader(
+                    pinned: true,
+                    delegate: SliverAppBarDelegate(
+                        child: PreferredSize(
+                      preferredSize: const Size.fromHeight(80),
+                      child: Center(
+                        child: SecondHeader(
                           context,
                           pilihan,
                           tempcheck,
                           changeViewStateLoading,
                           changeViewStateIndex,
                         ),
-                      ))),
-                  BlocConsumer<RepoBloc, RepoState>(
-                    listener: (context, state) {},
-                    builder: (context, state) {
-                      if (state is RepoLoadingUsers ||
-                          state is RepoUserLoaded ||
-                          state is MoreRepoUserLoaded ||
-                          state is EmptyDataUsers ||
-                          state is HTTPErrorUsers ||
-                          state is RepoProfileLoaded ||
-                          state is InitiateChangeViewUsersLoading ||
-                          state is InitiateChangeViewUsersIndex) {
-                        return SliverList(
-                          delegate: SliverChildBuilderDelegate(
+                      ),
+                    ))),
+                BlocConsumer<RepoBloc, RepoState>(
+                  listener: (context, state) {},
+                  builder: (context, state) {
+                    if (state is RepoLoadingUsers ||
+                        state is RepoUserLoaded ||
+                        state is MoreRepoUserLoaded ||
+                        state is EmptyDataUsers ||
+                        state is HTTPErrorUsers ||
+                        state is RepoProfileLoaded ||
+                        state is InitiateChangeViewUsersLoading ||
+                        state is InitiateChangeViewUsersIndex) {
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
-                              return GestureDetector(
-                                  onTap: () {
-                                    FocusNode currentFocus =
-                                        FocusScope.of(context);
-                                    if (!currentFocus.hasPrimaryFocus) {
-                                      currentFocus.unfocus();
-                                    }
-                                    !indexstate
-                                        ? getDataProfil(
-                                            context, data?[index].url, index)
-                                        : getDataProfil(
-                                            context,
-                                            dataforIndex?[pageCountControl]
-                                                    ?[index]
-                                                .url,
-                                            index);
-                                  },
-                                  child: !indexstate
-                                      ? dataCardUser(data, index,
-                                          pageCountControl, indexstate)
-                                      : dataCardUser(dataforIndex, index,
-                                          pageCountControl, indexstate));
-                            },
+                          return GestureDetector(
+                              onTap: () {
+                                FocusNode currentFocus = FocusScope.of(context);
+                                if (!currentFocus.hasPrimaryFocus) {
+                                  currentFocus.unfocus();
+                                }
+                                !indexstate
+                                    ? getDataProfil(
+                                        context, data[index].url, index)
+                                    : getDataProfil(
+                                        context,
+                                        dataforIndex?[pageCountControl][index]
+                                            .url,
+                                        index);
+                              },
+                              child: !indexstate
+                                  ? dataCardUser(
+                                      data, index, pageCountControl, indexstate)
+                                  : dataCardUser(dataforIndex, index,
+                                      pageCountControl, indexstate));
+                        },
                             childCount: !indexstate
-                                ? data?.length ?? 0
-                                : dataforIndex?[pageCountControl]?.length ?? 0,
-                          ),
-                        );
-                      } else if (state is RepoLoadingIssues ||
-                          state is RepoIssuesLoaded ||
-                          state is MoreRepoIssuesLoaded ||
-                          state is EmptyDataIssues ||
-                          state is HTTPErrorIssues ||
-                          state is InitiateChangeViewIssuesLoading ||
-                          state is InitiateChangeViewIssuesIndex) {
-                        return SliverList(
-                          delegate: SliverChildBuilderDelegate(
+                                ? data.length
+                                : (pagenum == 1 && data.length > 30
+                                    ? 30
+                                    : dataforIndex?[pageCountControl].length ??
+                                        data.length)),
+                      );
+                    } else if (state is RepoLoadingIssues ||
+                        state is RepoIssuesLoaded ||
+                        state is MoreRepoIssuesLoaded ||
+                        state is EmptyDataIssues ||
+                        state is HTTPErrorIssues ||
+                        state is InitiateChangeViewIssuesLoading ||
+                        state is InitiateChangeViewIssuesIndex) {
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
-                              return !indexstate
-                                  ? dataCardIssues(
-                                      context,
-                                      issuesTitle,
-                                      issuesDate,
-                                      index,
-                                      pageCountControl,
-                                      reg,
-                                      indexstate)
-                                  : dataCardIssues(
-                                      context,
-                                      issuesTitleforIndex,
-                                      issuesDate,
-                                      index,
-                                      pageCountControl,
-                                      reg,
-                                      indexstate);
-                            },
+                          return !indexstate
+                              ? dataCardIssues(context, issuesTitle, issuesDate,
+                                  index, pageCountControl, reg, indexstate)
+                              : dataCardIssues(
+                                  context,
+                                  issuesTitleforIndex,
+                                  issuesDate,
+                                  index,
+                                  pageCountControl,
+                                  reg,
+                                  indexstate);
+                        },
+                            // childCount: !indexstate
+                            //     ? issuesTitle?.length ?? 0
+                            //     : issuesTitleforIndex?[pageCountControl]
+                            //             ?.length ??
+                            //         0,
                             childCount: !indexstate
-                                ? issuesTitle?.length ?? 0
-                                : issuesTitleforIndex?[pageCountControl]
-                                        ?.length ??
-                                    0,
-                          ),
-                        );
-                      } else if (state is RepoLoadingRepos ||
-                          state is RepoReposLoaded ||
-                          state is MoreRepoReposLoaded ||
-                          state is EmptyDataRepos ||
-                          state is HTTPErrorRepos ||
-                          state is InitiateChangeViewReposLoading ||
-                          state is InitiateChangeViewReposIndex) {
-                        return SliverList(
-                          delegate: SliverChildBuilderDelegate(
+                                ? issuesTitle?.length
+                                : (pagenum == 1 && issuesTitle!.length > 30
+                                    ? 30
+                                    : issuesTitleforIndex?[pageCountControl]
+                                            ?.length ??
+                                        issuesTitle?.length)),
+                      );
+                    } else if (state is RepoLoadingRepos ||
+                        state is RepoReposLoaded ||
+                        state is MoreRepoReposLoaded ||
+                        state is EmptyDataRepos ||
+                        state is HTTPErrorRepos ||
+                        state is InitiateChangeViewReposLoading ||
+                        state is InitiateChangeViewReposIndex) {
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
-                              return !indexstate
-                                  ? dataCardRepositories(
-                                      context,
-                                      pageCountControl,
-                                      repodata,
-                                      index,
-                                      indexstate)
-                                  : dataCardRepositories(
-                                      context,
-                                      pageCountControl,
-                                      repodataforIndex,
-                                      index,
-                                      indexstate);
-                              //return Container();
-                            },
+                          return !indexstate
+                              ? dataCardRepositories(context, pageCountControl,
+                                  repodata, index, indexstate)
+                              : dataCardRepositories(context, pageCountControl,
+                                  repodataforIndex, index, indexstate);
+                        },
                             childCount: !indexstate
-                                ? repodata?.length ?? 0
-                                : repodataforIndex?[pageCountControl]?.length ??
-                                    0,
-                          ),
-                        );
-                      }
-                      return SliverToBoxAdapter(child: Container());
-                    },
-                  ),
-                  if (isloading && lazyloading == true)
-                    SliverToBoxAdapter(
-                      child: loading(),
-                    )
-                  else if (indexstate)
-                    sliverFillRemaining(
-                        isloading,
-                        indexstate,
-                        pagenum,
-                        getMoreDataAccordingToCategories,
-                        goBackOnePage,
-                        goNextOnePageChangeScrollPos)
-                ],
-              ),
+                                ? repodata?.length
+                                : (pagenum == 1 && repodata!.length > 30
+                                    ? 30
+                                    : repodataforIndex?[pageCountControl]
+                                            ?.length ??
+                                        repodata?.length)),
+                      );
+                    }
+                    return SliverToBoxAdapter(child: Container());
+                  },
+                ),
+                if (indexstate)
+                  sliverFillRemaining(
+                      isloading,
+                      indexstate,
+                      pagenum,
+                      getMoreDataAccordingToCategories,
+                      goBackOnePage,
+                      goNextOnePageChangeScrollPos)
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -333,8 +341,9 @@ class _RepoLogicState extends State<RepoLogic> {
     }
     if (pageCountControl != 0) {
       pageCountControl--;
-      _scrollController.jumpTo(1);
     }
+    _scrollController.jumpTo(1);
+    setState(() {});
   }
 
   goNextOnePageChangeScrollPos() {
@@ -346,17 +355,17 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   changeViewStateLoading() {
-    print("change to lazty loading called");
-
-    lazyloading = true;
-    indexstate = false;
+    setState(() {
+      lazyloading = true;
+      indexstate = false;
+    });
   }
 
   changeViewStateIndex() {
-    print("change to index called");
-
-    indexstate = true;
-    lazyloading = false;
+    setState(() {
+      indexstate = true;
+      lazyloading = false;
+    });
   }
 
   clearTextController() {
@@ -376,14 +385,13 @@ class _RepoLogicState extends State<RepoLogic> {
     });
 
     if (textEditingController.text.isEmpty) {
-      //clear list when query box is empty
       final repoBloc = context.read<RepoBloc>();
       repoBloc.add(DeleteList());
     }
   }
 
   repoLoading() {
-    data?.clear();
+    data.clear();
 
     issuesTitle?.clear();
     issuesDate?.clear();
@@ -433,30 +441,19 @@ class _RepoLogicState extends State<RepoLogic> {
 
   repoUserLoaded(state, temp) {
     if (state.userdata.items!.isNotEmpty) {
-      temp?.clear();
-      data?.clear();
-      dataforIndex?.clear();
+      data.clear();
+      dataforIndex = [];
       pageCountControl = 0;
       pagenum = 1;
-      int? count = state.userdata.items?.length;
-      //dataforIndex?[0].add(state.userdata.items?[0]);
-      //print(dataforIndex?.length);
-      for (var i = 0; i < count!; i++) {
-        data?.add(state.userdata.items?[i]);
-        temp?.add(state.userdata.items?[i]);
-        //dataforIndex?[pageCountControl].add(state.userdata.items?[i]);
+      int? count = state.userdata.items?.length ?? 0;
 
+      for (var i = 0; i < count!; i++) {
+        data.add(state.userdata.items?[i]);
+        temp?.add(state.userdata.items?[i]);
       }
-      print(temp.length);
+
       dataforIndex?.add(data);
       temp.clear();
-      print(dataforIndex?.length);
-      print(dataforIndex?[pageCountControl]?[0].login);
-      print(
-          " pageCountControl $pageCountControl ${dataforIndex?[pageCountControl]?.length}");
-
-      // print(
-      //     "data for index page ke : $pageCountControl isi : ${dataforIndex?[pageCountControl]?.length}");
       isloading = false;
     } else {
       final repoBloc = context.read<RepoBloc>();
@@ -468,28 +465,20 @@ class _RepoLogicState extends State<RepoLogic> {
 
   moreRepoUserLoaded(state, temp) {
     temp.clear();
+
     if (state.userdata.items!.isNotEmpty) {
-      pageCountControl++;
-      //pagenum++;
       int? count = state.userdata.items?.length;
+      pageCountControl++;
 
       for (var i = 0; i < count!; i++) {
-        data?.add(state.userdata.items?[i]);
+        data.add(state.userdata.items?[i]);
         temp?.add(state.userdata.items?[i]);
       }
-      print(temp.length);
+
       dataforIndex?.add(temp);
-      print(dataforIndex?.length);
-      print(dataforIndex?[pageCountControl]?.length);
+
       isloading = false;
     } else {
-      if (pageCountControl != 0) {
-        pageCountControl--;
-      }
-      if (pagenum > 1) {
-        pagenum--;
-      }
-
       final repoBloc = context.read<RepoBloc>();
       repoBloc.add(EmptyDataEventUsers());
       isloading = false;
@@ -517,9 +506,7 @@ class _RepoLogicState extends State<RepoLogic> {
       }
       issuesTitleforIndex?.add(issuesTitle);
       tempData.clear();
-      print(tempData.length);
-      print(issuesTitleforIndex?.length);
-      print(issuesTitleforIndex?[pageCountControl]?.length);
+
       isloading = false;
     } else {
       final repoBloc = context.read<RepoBloc>();
@@ -536,7 +523,6 @@ class _RepoLogicState extends State<RepoLogic> {
       int? count = state.issuesData.items?.length;
       RegExp reg = RegExp("^([^T])+");
       pageCountControl++;
-      //pagenum++;
 
       for (var i = 0; i < count!; i++) {
         issuesTitle?.add(state.issuesData.items?[i]);
@@ -566,12 +552,10 @@ class _RepoLogicState extends State<RepoLogic> {
       for (var i = 0; i < count!; i++) {
         repodata?.add(state.reposData.items?[i]);
         temp?.add(state.reposData.items?[i]);
-        //repodataowner?.add(state.reposData.items?[i].owner?.avatarUrl);
-        //print(repodataowner?[i].avatarUrl);
       }
       repodataforIndex?.add(repodata);
       temp.clear();
-      print(repodataforIndex?[pageCountControl]?.length);
+
       isloading = false;
     } else {
       final repoBloc = context.read<RepoBloc>();
@@ -589,10 +573,9 @@ class _RepoLogicState extends State<RepoLogic> {
       for (var i = 0; i < count!; i++) {
         repodata?.add(state.reposData.items?[i]);
         temp?.add(state.reposData.items?[i]);
-        //print(repodataowner?[i].avatarUrl);
       }
       repodataforIndex?.add(temp);
-      print(repodataforIndex?[pageCountControl]?.length);
+
       isloading = false;
     } else {
       final repoBloc = context.read<RepoBloc>();
@@ -630,7 +613,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   clearList() {
-    data?.clear();
+    data.clear();
     issuesTitle?.clear();
     issuesDate?.clear();
     repodata?.clear();
@@ -655,19 +638,16 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   getdataUser(BuildContext context, String username) {
-    globals.queryUsers = username;
     final repoBloc = context.read<RepoBloc>();
     repoBloc.add(GetUsers(username, 1));
   }
 
   getdataIssues(BuildContext context, String username) {
-    globals.queryUsers = username;
     final repoBloc = context.read<RepoBloc>();
     repoBloc.add(GetIssues(username, 1));
   }
 
   getdatarepos(BuildContext context, String username) {
-    globals.queryUsers = username;
     final repoBloc = context.read<RepoBloc>();
     repoBloc.add(GetRepositories(username, 1));
   }
@@ -675,37 +655,29 @@ class _RepoLogicState extends State<RepoLogic> {
   getMoreDataAccordingToCategories() {
     if (textEditingController.text.isNotEmpty && !isloading) {
       if (pilihan == "USERS") {
-        //print("GET MORE USERS CALLED FROM SCROLL");
-        // pageCountControl++;
         fetchingDataSnackbar();
         pagenum++;
         isloading = true;
-        //setState(() {});
+
         final repoBloc = context.read<RepoBloc>();
-        repoBloc.add(GetMoreUsers(globals.queryUsers.toString(), pagenum));
+        repoBloc.add(GetMoreUsers(textEditingController.text, pagenum));
       }
       if (pilihan == "ISSUES") {
-        // print("GET MORE ISSUES CALLED FROM SCROLL");
-        // pageCountControl++;
         fetchingDataSnackbar();
         pagenum++;
         isloading = true;
-        //setState(() {});
+
         final repoBloc = context.read<RepoBloc>();
-        repoBloc.add(GetMoreIssues(globals.queryUsers.toString(), pagenum));
+        repoBloc.add(GetMoreIssues(textEditingController.text, pagenum));
       }
 
       if (pilihan == "REPOSITORIES") {
-        // print(
-        //     "GET MORE REPOSITORIES CALLED FROM SCROLL");
-        //pageCountControl++;
         fetchingDataSnackbar();
         pagenum++;
         isloading = true;
-        //setState(() {});
+
         final repoBloc = context.read<RepoBloc>();
-        repoBloc
-            .add(GetMoreRepositories(globals.queryUsers.toString(), pagenum));
+        repoBloc.add(GetMoreRepositories(textEditingController.text, pagenum));
       }
     }
   }

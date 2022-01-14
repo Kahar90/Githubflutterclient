@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -42,13 +44,12 @@ class Functions {
     var reposData = RepoRepos.fromJson(jsonDecode(response.toString()));
 
     print("function get repos called with query $query and pagenum $pagenum");
-    print("dari function getrepos : ${reposData.items?.length}");
 
     return reposData;
   }
 
-  Future<RepoProfileInfo> getProfileInfo(String query) async {
-    var response = await Dio().get(Uri.parse(query).toString());
+  Future<RepoProfileInfo> getProfileInfo(String? query) async {
+    var response = await Dio().get(Uri.parse(query.toString()).toString());
 
     var profileData = RepoProfileInfo.fromJson(jsonDecode(response.toString()));
 

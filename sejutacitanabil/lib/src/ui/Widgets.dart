@@ -26,7 +26,7 @@ Widget dataCardUser(
                       image: "${data?[index].avatarUrl}")
                   : FadeInImage.memoryNetwork(
                       placeholder: kTransparentImage,
-                      image: "${data?[pagecountusers][index].avatarUrl}"),
+                      image: "${data?[pagecountusers]?[index].avatarUrl}"),
             ),
           ),
           const SizedBox(

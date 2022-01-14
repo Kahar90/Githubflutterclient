@@ -5,7 +5,6 @@ import 'package:sejutacitanabil/src/models/repo_issues.dart';
 import 'package:sejutacitanabil/src/models/repoProfileInfo.dart';
 import 'package:sejutacitanabil/src/models/repoRepos.dart';
 import 'package:sejutacitanabil/src/models/repoUser.dart';
-
 part 'repo_event.dart';
 part 'repo_state.dart';
 
@@ -91,30 +90,24 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
       //emit(const LazyLoadingState());
       if (event.categories == "USERS") {
         emit(InitiateChangeViewUsersLoading(event.categories));
-        print("InitiateChangeViewUsersLoading");
       }
       if (event.categories == "ISSUES") {
         emit(InitiateChangeViewIssuesLoading(event.categories));
-        print("InitiateChangeViewIssuesLoading");
       }
       if (event.categories == "REPOSITORIES") {
         emit(InitiateChangeViewReposLoading(event.categories));
-        print("InitiateChangeViewReposLoading");
       }
     });
     on<ChangeToIndex>((event, emit) {
       // emit(const IndexState());
       if (event.categories == "USERS") {
         emit(InitiateChangeViewUsersIndex(event.categories));
-        print("InitiateChangeViewUsersIndex");
       }
       if (event.categories == "ISSUES") {
         emit(InitiateChangeViewIssuesIndex(event.categories));
-        print("InitiateChangeViewIssuesIndex");
       }
       if (event.categories == "REPOSITORIES") {
         emit(InitiateChangeViewReposIndex(event.categories));
-        print("InitiateChangeViewReposIndex");
       }
     });
     on<DeleteList>((event, emit) {

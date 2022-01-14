@@ -11,7 +11,7 @@ class GetUsers extends RepoEvent {
 }
 
 class GetProfileInfo extends RepoEvent {
-  final String query;
+  final String? query;
   final int index;
 
   GetProfileInfo(this.query, this.index);
