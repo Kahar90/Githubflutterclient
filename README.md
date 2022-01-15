@@ -11,3 +11,11 @@ Built with bloc pattern
 Hello there!, you can find UI related files in the "ui" folder, "functions.dart" file stores the network functions for API calls,
 "models" folder stores  models classes to store the said calls, and finally, "bloc" folder stores our bloc related files. 
 to make changes to the app, go to "RepoLogicMain.dart" inside the "ui" folder which stores all the main codes and branch off from there to specific UI in other files. 
+
+#Features
+ - User Search
+ - Issues Search
+ - Repo Search
+ - View Profile
+ - Lazy Loading or Indexing View
+ - Page number state saved between views
