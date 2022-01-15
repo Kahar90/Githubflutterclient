@@ -1,8 +1,8 @@
 # sejutacitanabil
-Github Flutter Client - GithubAPI
+# Github Flutter Client - GithubAPI
 
 Built with bloc pattern
-Packages Used :
+# Packages Used :
   - flutter_bloc: ^8.0.1
   - dio: ^4.0.4
   - transparent_image: ^2.0.0
