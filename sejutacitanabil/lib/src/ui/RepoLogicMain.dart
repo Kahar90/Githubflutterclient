@@ -15,7 +15,7 @@ Welcome, this file stores the main codes that runs the app, at the upper section
 (return FirstHeader(), return Container(), bla bla bla), and below it are the many functions of the app, it is labeled roughly the same as what it actually does,
 such as for example getDataAccordingToCategories() does get data according to the category chosen. Be sure to read it from the boiler code, and then branch 
 off to specific widgets and functions to understand and make changes to the app. Also take note that some Variables that are not used here is reserved for future 
-features that I am planning to add later down the line.
+features that I am planning to add later down the line. Finally, with only 4 days of work time, please be mindful of using the app, (don't push it to the extreme like a madman ;) ),
 */
 
 class RepoLogic extends StatefulWidget {
