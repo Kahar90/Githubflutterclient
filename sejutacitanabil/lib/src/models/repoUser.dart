@@ -1,6 +1,6 @@
 class RepoUser {
-  // ignore: unnecessary_question_mark
-  dynamic? totalCount;
+  /* Models for USERS API calls */
+  dynamic totalCount;
   bool? incompleteResults;
   List<Items>? items;
 

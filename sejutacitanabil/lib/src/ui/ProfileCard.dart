@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+/* Widget for profile card */
 Widget alertDialog(BuildContext context, dynamic data, dynamic state,
     bool indexstate, int page) {
   return AlertDialog(

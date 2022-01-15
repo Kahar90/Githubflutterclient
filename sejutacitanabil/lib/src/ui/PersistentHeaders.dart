@@ -27,6 +27,7 @@ class SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
+//First Header refers to the first persistent header you see, the one that stores the searchbox
 class FirstHeader extends StatelessWidget {
   const FirstHeader(
     this.context,
@@ -93,6 +94,7 @@ class FirstHeader extends StatelessWidget {
   }
 }
 
+//Second Header is right below it, storing the radiobuttons that controls the state of the program
 class SecondHeader extends StatelessWidget {
   const SecondHeader(this.context, this.pilihan, this.tempcheck,
       this.changeViewStateLoading, this.changeViewStateIndex);

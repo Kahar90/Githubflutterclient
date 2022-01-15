@@ -1,5 +1,4 @@
 // ignore_for_file: sized_box_for_whitespace
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +9,14 @@ import 'package:sejutacitanabil/src/ui/ProfileCard.dart';
 import 'package:sejutacitanabil/src/ui/Widgets.dart';
 import 'package:sejutacitanabil/src/ui/sliverFillRemaining.dart';
 import '../bloc/repo_bloc.dart';
+
+/* 
+Welcome, this file stores the main codes that runs the app, at the upper section of the code you can see the boiler code that controls it
+(return FirstHeader(), return Container(), bla bla bla), and below it are the many functions of the app, it is labeled roughly the same as what it actually does,
+such as for example getDataAccordingToCategories() does get data according to the category chosen. Be sure to read it from the boiler code, and then branch 
+off to specific widgets and functions to understand and make changes to the app. Also take note that some Variables that are not used here is reserved for future 
+features that I am planning to add later down the line.
+*/
 
 class RepoLogic extends StatefulWidget {
   const RepoLogic({Key? key}) : super(key: key);
@@ -73,6 +80,9 @@ class _RepoLogicState extends State<RepoLogic> {
             !isloading) {
           getMoreDataAccordingToCategories();
         }
+        /* This logic right here is how we can track our current displayed page on the screen, 
+       ~2300 is the offset value of the very bottom, knowing this  we can divide it like so 
+       to get the page visible at the time and store it into a variable */
         if (_scrollController.offset < 2400) {
           pageCountControl = 0;
         } else {
@@ -278,11 +288,6 @@ class _RepoLogicState extends State<RepoLogic> {
                                   reg,
                                   indexstate);
                         },
-                            // childCount: !indexstate
-                            //     ? issuesTitle?.length ?? 0
-                            //     : issuesTitleforIndex?[pageCountControl]
-                            //             ?.length ??
-                            //         0,
                             childCount: !indexstate
                                 ? issuesTitle?.length
                                 : (pagenum == 1 && issuesTitle!.length > 30
@@ -336,6 +341,8 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   goBackOnePage() {
+    /* Called when index button are pressed, this one sends 
+    the user back to the previous page */
     if (pagenum > 1) {
       pagenum--;
     }
@@ -347,14 +354,19 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   goNextOnePageChangeScrollPos() {
+    /* This is one is a simple one, since data fetching logic has been 
+    applied elsewhere, this function sole purpose is to send the user
+    scroll offset to the very first index of the List  */
     _scrollController.jumpTo(1);
   }
 
   changeCategories(String value) {
+    /* Changes categories (USERS, ISSUES, REPOSITORIES) */
     pilihan = value;
   }
 
   changeViewStateLoading() {
+    /* Changes view state (LazyLoading, Indexing) */
     setState(() {
       lazyloading = true;
       indexstate = false;
@@ -362,6 +374,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   changeViewStateIndex() {
+    /* Changes view state (LazyLoading, Indexing) */
     setState(() {
       indexstate = true;
       lazyloading = false;
@@ -369,12 +382,16 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   clearTextController() {
+    /* Clear the TextController, and call DeleteList to get the app ready for new queries */
     textEditingController.clear();
     final repoBloc = context.read<RepoBloc>();
     repoBloc.add(DeleteList());
   }
 
   searchQuery() {
+    /* This app tracks the current active debounce, if around ~1,5s has passed
+    since the last time the user has inputted something in the search box, it will then
+    do the fetching of our data */
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 1500), () {
       if (textEditingController.text.isNotEmpty) {
@@ -383,7 +400,7 @@ class _RepoLogicState extends State<RepoLogic> {
         getDataAccordingToCategories();
       }
     });
-
+    /* simple check if textcontroller value is empty */
     if (textEditingController.text.isEmpty) {
       final repoBloc = context.read<RepoBloc>();
       repoBloc.add(DeleteList());
@@ -391,6 +408,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   repoLoading() {
+    /* Logics on what to do when loading is happening */
     data.clear();
 
     issuesTitle?.clear();
@@ -414,6 +432,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   fetchingDataSnackbar() {
+    /* Show a snackbar */
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.black54,
         duration: const Duration(milliseconds: 600),
@@ -431,6 +450,8 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   repoProfileLoaded(state) {
+    /* Show's the screen when you press a profile, this will call alertDialog and then 
+    shows the data fetch from the API on a specific User Profile */
     showDialog(
         context: context,
         builder: (context) => !indexstate
@@ -440,6 +461,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   repoUserLoaded(state, temp) {
+    /* Logics on what to do when data of search query has loaded */
     if (state.userdata.items!.isNotEmpty) {
       data.clear();
       dataforIndex = [];
@@ -464,6 +486,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   moreRepoUserLoaded(state, temp) {
+    /* Logics on what to do when data search query has loaded (specific for calling more datas)*/
     temp.clear();
 
     if (state.userdata.items!.isNotEmpty) {
@@ -487,6 +510,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   repoIssuesLoaded(state, tempData) {
+    /* Logics on what to do when data of search query has loaded */
     if (state.issuesData.items!.isNotEmpty) {
       issuesTitle?.clear();
       issuesDate?.clear();
@@ -517,6 +541,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   moreRepoIssuesLoaded(state, tempData) {
+    /* Logics on what to do when data search query has loaded (specific for calling more datas)*/
     tempData.clear();
 
     if (state.issuesData.items!.isNotEmpty) {
@@ -543,6 +568,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   repoReposLoaded(state, temp) {
+    /* Logics on what to do when data of search query has loaded */
     if (state.reposData.items!.isNotEmpty) {
       repodata?.clear();
       repodataforIndex?.clear();
@@ -566,6 +592,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   moreRepoReposLoaded(state, temp) {
+    /* Logics on what to do when data search query has loaded (specific for calling more datas)*/
     temp.clear();
     if (state.reposData.items!.isNotEmpty) {
       int? count = state.reposData.items?.length;
@@ -586,6 +613,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   initiateChange(state) {
+    /* Logics on what need to be done when initiate change state is happening */
     if (textEditingController.text.isNotEmpty) {
       if (state.whattodo == "USERS") {
         getdataUser(context, textEditingController.text);
@@ -600,6 +628,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   emptyData() {
+    /* Logics on what to do when data returned from API calls is empty */
     pagenum--;
     isloading = false;
     ScaffoldMessenger.of(context)
@@ -613,6 +642,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   clearList() {
+    /* Clears Lists */
     data.clear();
     issuesTitle?.clear();
     issuesDate?.clear();
@@ -623,6 +653,7 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   error() {
+    /* Error */
     if (pageCountControl != 0) {
       pageCountControl--;
     }
@@ -633,26 +664,47 @@ class _RepoLogicState extends State<RepoLogic> {
   }
 
   getDataProfil(BuildContext context, String urlprofile, int index) {
+    /* Get profile data (specific for profile card) */
     final repoBloc = context.read<RepoBloc>();
     repoBloc.add(GetProfileInfo(urlprofile, index));
   }
 
   getdataUser(BuildContext context, String username) {
+    /* Get Data User */
     final repoBloc = context.read<RepoBloc>();
     repoBloc.add(GetUsers(username, 1));
   }
 
   getdataIssues(BuildContext context, String username) {
+    /* Get Data Issues */
     final repoBloc = context.read<RepoBloc>();
     repoBloc.add(GetIssues(username, 1));
   }
 
   getdatarepos(BuildContext context, String username) {
+    /* Get Data Repositories */
     final repoBloc = context.read<RepoBloc>();
     repoBloc.add(GetRepositories(username, 1));
   }
 
+  getDataAccordingToCategories() {
+    /* Get data according to categories (USERS, ISSUES, REPOSITORIES) */
+    FocusNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    isloading = true;
+    if (pilihan == "USERS") {
+      getdataUser(context, textEditingController.text);
+    } else if (pilihan == "ISSUES") {
+      getdataIssues(context, textEditingController.text);
+    } else if (pilihan == "REPOSITORIES") {
+      getdatarepos(context, textEditingController.text);
+    }
+  }
+
   getMoreDataAccordingToCategories() {
+    /* Get more data according to categories (USERS, ISSUES, REPOSITORIES) */
     if (textEditingController.text.isNotEmpty && !isloading) {
       if (pilihan == "USERS") {
         fetchingDataSnackbar();
@@ -679,21 +731,6 @@ class _RepoLogicState extends State<RepoLogic> {
         final repoBloc = context.read<RepoBloc>();
         repoBloc.add(GetMoreRepositories(textEditingController.text, pagenum));
       }
-    }
-  }
-
-  getDataAccordingToCategories() {
-    FocusNode currentFocus = FocusScope.of(context);
-    if (!currentFocus.hasPrimaryFocus) {
-      currentFocus.unfocus();
-    }
-    isloading = true;
-    if (pilihan == "USERS") {
-      getdataUser(context, textEditingController.text);
-    } else if (pilihan == "ISSUES") {
-      getdataIssues(context, textEditingController.text);
-    } else if (pilihan == "REPOSITORIES") {
-      getdatarepos(context, textEditingController.text);
     }
   }
 }

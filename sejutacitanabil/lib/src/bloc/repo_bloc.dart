@@ -11,7 +11,7 @@ part 'repo_state.dart';
 class RepoBloc extends Bloc<RepoEvent, RepoState> {
   final Functions _functions;
   RepoBloc(this._functions) : super(const RepoInitial()) {
-    //USERS
+    /* USERS BLOC */
     on<GetUsers>(
       (event, emit) async {
         try {
@@ -24,6 +24,7 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         }
       },
     );
+
     on<GetMoreUsers>((event, emit) async {
       try {
         final userdata =
@@ -33,6 +34,7 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         emit(const HTTPErrorUsers());
       }
     });
+
     on<GetProfileInfo>((event, emit) async {
       try {
         final profileInfoData = await _functions.getProfileInfo(event.query);
@@ -41,7 +43,8 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         emit(const HTTPErrorUsers());
       }
     });
-    //ISSUES
+
+    /* ISSUES BLOC */
     on<GetIssues>((event, emit) async {
       emit(const RepoLoadingIssues());
       try {
@@ -52,6 +55,7 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         emit(const HTTPErrorIssues());
       }
     });
+
     on<GetMoreIssues>((event, emit) async {
       try {
         final issuesData =
@@ -61,7 +65,8 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         emit(const HTTPErrorIssues());
       }
     });
-    //REPOS
+
+    /* REPOS */
     on<GetRepositories>((event, emit) async {
       emit(const RepoLoadingRepos());
       try {
@@ -72,6 +77,7 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         emit(const HTTPErrorRepos());
       }
     });
+
     on<GetMoreRepositories>((event, emit) async {
       try {
         final reposData =
@@ -81,13 +87,14 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         emit(const HTTPErrorRepos());
       }
     });
-    //MISC
+
+    /* MISC */
     on<ChangeCategoriesEvent>((event, emit) {
       emit(const ClearList());
       emit(InitiateChange(event.categories));
     });
+
     on<ChangetoLazyLoading>((event, emit) {
-      //emit(const LazyLoadingState());
       if (event.categories == "USERS") {
         emit(InitiateChangeViewUsersLoading(event.categories));
       }
@@ -98,8 +105,8 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         emit(InitiateChangeViewReposLoading(event.categories));
       }
     });
+
     on<ChangeToIndex>((event, emit) {
-      // emit(const IndexState());
       if (event.categories == "USERS") {
         emit(InitiateChangeViewUsersIndex(event.categories));
       }
@@ -110,15 +117,19 @@ class RepoBloc extends Bloc<RepoEvent, RepoState> {
         emit(InitiateChangeViewReposIndex(event.categories));
       }
     });
+
     on<DeleteList>((event, emit) {
       emit(const ClearList());
     });
+
     on<EmptyDataEventUsers>((event, emit) {
       emit(const EmptyDataUsers());
     });
+
     on<EmptyDataEventIssues>((event, emit) {
       emit(const EmptyDataIssues());
     });
+
     on<EmptyDataEventRepos>((event, emit) {
       emit(const EmptyDataRepos());
     });

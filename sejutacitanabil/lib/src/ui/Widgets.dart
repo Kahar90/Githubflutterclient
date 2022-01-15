@@ -16,7 +16,7 @@ Widget dataCardUser(
             width: 5,
           ),
           Container(
-            padding: EdgeInsets.only(left: 1),
+            padding: const EdgeInsets.only(left: 1),
             height: 70,
             width: 70,
             child: ClipOval(

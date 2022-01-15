@@ -1,4 +1,5 @@
 class RepoProfileInfo {
+  /* Models for specific profile info API calls */
   String? login;
   int? id;
   String? nodeId;

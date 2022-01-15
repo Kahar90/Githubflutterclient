@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/* Widget for the index buttons when indexing is chosen, it is named as sliverFillRemaining for easy reference */
 Widget sliverFillRemaining(
   bool isloading,
   bool index,

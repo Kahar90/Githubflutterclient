@@ -1,4 +1,5 @@
 class RepoRepos {
+  /* Models for REPOSITORIES API calls */
   int? totalCount;
   bool? incompleteResults;
   List<Items>? items;

@@ -1,4 +1,5 @@
 class RepoIssues {
+  /* Models for ISSUES API Calls */
   int? totalCount;
   bool? incompleteResults;
   List<Items>? items;
