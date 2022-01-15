@@ -321,7 +321,30 @@ class _RepoLogicState extends State<RepoLogic> {
                                         repodata?.length)),
                       );
                     }
-                    return SliverToBoxAdapter(child: Container());
+                    return SliverToBoxAdapter(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 250,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          alignment: Alignment.center,
+                          child: const Text(
+                            "Why don't you try to search for something?\n🤔",
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.black54,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 300,
+                        ),
+                      ],
+                    ));
                   },
                 ),
                 if (indexstate)
