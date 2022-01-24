@@ -1,4 +1,4 @@
-# sejutacitanabil
+# An app made for a technical test, showcases common state management, REST APIs, and data parsing.
 # Github Flutter Client - GithubAPI
 
 Built with bloc pattern
